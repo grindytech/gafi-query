@@ -1,0 +1,12 @@
+# type Account @entity {
+#   id: ID!
+#   publicAddress: String!
+# }
+
+type Transfer @entity {
+  id: ID! #id is a required field
+  amount: BigInt!
+  blockNumber: BigInt! #filed2 is an optional field
+  from: String!
+  to: String!
+}

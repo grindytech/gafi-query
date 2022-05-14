@@ -1,0 +1,33 @@
+specVersion: 1.0.0
+name: gafi-query
+version: 1.0.0
+runner:
+  node:
+    name: '@subql/node'
+    version: ^0.33.0
+  query:
+    name: '@subql/query'
+    version: 0.24.0
+description: Subquery project for GAFI network
+repository: 'https://github.com/cryptoviet/gafi-query'
+schema:
+  file: ./schema.graphql
+network:
+  endpoint: 'wss://ws.gafi.network'
+  dictionary: 'https://api.subquery.network/sq/subquery/dictionary-polkadot'
+  genesisHash: '0x8940bbe8a80c8702af494401bc3a82bd8b180eb761204b45577b89e9a316d70a'
+dataSources:
+  - kind: substrate/Runtime
+    startBlock: 1
+    mapping:
+      file: ./dist/index.js
+      handlers:
+        - handler: handleBlock
+          kind: substrate/BlockHandler
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: balances
+            method: Transfer
+        - handler: handleCall
+          kind: substrate/CallHandler
