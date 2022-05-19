@@ -14,7 +14,6 @@ schema:
   file: ./schema.graphql
 network:
   endpoint: 'wss://ws.gafi.network'
-  dictionary: 'https://api.subquery.network/sq/subquery/dictionary-polkadot'
   genesisHash: '0x8940bbe8a80c8702af494401bc3a82bd8b180eb761204b45577b89e9a316d70a'
 dataSources:
   - kind: substrate/Runtime
@@ -31,3 +30,8 @@ dataSources:
             method: Transfer
         - handler: handleCall
           kind: substrate/CallHandler
+        - handler: handleSponsoredPoolCreate
+          kind: substrate/EventHandler
+          filter:
+            module: sponsoredPool
+            method: CreatedPool

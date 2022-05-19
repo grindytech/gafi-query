@@ -1,5 +1,5 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Transfer, BlockEntity } from "../types";
+import { Transfer, BlockEntity, SponsoredPool } from "../types";
 import { Balance } from "@polkadot/types/interfaces";
 
 export async function handleBlock(block: SubstrateBlock): Promise<void> {
@@ -29,4 +29,19 @@ export async function handleCall(extrinsic: SubstrateExtrinsic): Promise<void> {
   //Boolean tyep
   record.field5 = true;
   await record.save();
+}
+export async function handleSponsoredPoolCreate(event: SubstrateEvent): Promise<void> {
+  const createdPool = new SponsoredPool(`${event.block.block.header.number.toNumber()}-${event.idx}`);
+  //Date type timestamp
+  const { extrinsic } = event;
+  if (extrinsic) {
+    createdPool.poolOwner = extrinsic.extrinsic.signer.toString();
+    createdPool.amount = extrinsic.extrinsic.args[1] as unknown as bigint;
+    createdPool.discount = extrinsic.extrinsic.args[2] as unknown as bigint;
+    createdPool.txLimit = extrinsic.extrinsic.args[3] as unknown as number;
+
+    //Boolean tyep
+    createdPool.createdAt = extrinsic.block.timestamp;
+    await createdPool.save();
+  }
 }

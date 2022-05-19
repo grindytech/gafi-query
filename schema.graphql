@@ -5,9 +5,18 @@
 
 type BlockEntity @entity {
   id: ID! #id is a required field
-  field1: Int!
-  field4: Date!
-  field5: Boolean!
+  field1: Int
+  field4: Date
+  field5: Boolean
+}
+
+type SponsoredPool @entity {
+  id: ID!
+  amount: BigInt!
+  discount: BigInt!
+  poolOwner: String!
+  txLimit: Int!
+  createdAt: Date
 }
 
 type Transfer @entity {
