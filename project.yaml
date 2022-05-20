@@ -8,13 +8,17 @@ runner:
   query:
     name: '@subql/query'
     version: 0.24.0
-description: Subquery project for GAFI network
+description: SubQuery project for GAFI network
 repository: 'https://github.com/cryptoviet/gafi-query'
 schema:
   file: ./schema.graphql
 network:
   endpoint: 'wss://ws.gafi.network'
   genesisHash: '0x8940bbe8a80c8702af494401bc3a82bd8b180eb761204b45577b89e9a316d70a'
+
+  # Local env
+  # endpoint: 'ws://host.docker.internal:9944'
+  # genesisHash: '0xe964f89acfad7961004e9cb68750c337e4651df21b7159735a3bd3f1a64814ea'
 dataSources:
   - kind: substrate/Runtime
     startBlock: 1
@@ -30,7 +34,7 @@ dataSources:
             method: Transfer
         - handler: handleCall
           kind: substrate/CallHandler
-        - handler: handleSponsoredPoolCreate
+        - handler: handleCreateSponsoredPool
           kind: substrate/EventHandler
           filter:
             module: sponsoredPool

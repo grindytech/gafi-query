@@ -8,15 +8,7 @@ type BlockEntity @entity {
   field1: Int
   field4: Date
   field5: Boolean
-}
-
-type SponsoredPool @entity {
-  id: ID!
-  amount: BigInt!
-  discount: BigInt!
-  poolOwner: String!
-  txLimit: Int!
-  createdAt: Date
+  field6: String
 }
 
 type Transfer @entity {
@@ -25,4 +17,13 @@ type Transfer @entity {
   blockNumber: BigInt!
   from: String!
   to: String!
+}
+
+type SponsoredPool @entity {
+  id: ID! #id is a required field
+  poolOwner: String!
+  amount: BigInt!
+  discount: Int!
+  txLimit: Int!
+  createdAt: Date
 }
