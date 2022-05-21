@@ -21,6 +21,7 @@ type Transfer @entity {
 
 type SponsoredPool @entity {
   id: ID! #id is a required field
+  poolId: String!
   poolOwner: String!
   amount: BigInt!
   discount: Int!

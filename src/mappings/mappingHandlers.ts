@@ -33,11 +33,18 @@ export async function handleCall(extrinsic: SubstrateExtrinsic): Promise<void> {
 export async function handleCreateSponsoredPool(event: SubstrateEvent): Promise<void> {
   const createdPool = new SponsoredPool(`${event.block.block.header.number.toNumber()}-${event.idx}`);
   logger.info(`created pool ${event.block.hash.toString()}`);
-  const { extrinsic: eventExtrinsic } = event;
+  const {
+    extrinsic: eventExtrinsic,
+    event: {
+      data: [poolId]
+    }
+  } = event;
 
-  if (eventExtrinsic) {
+  if (eventExtrinsic && poolId) {
     const { extrinsic, block, success } = eventExtrinsic;
     if (success) {
+      createdPool.poolId = poolId.toString();
+
       createdPool.createdAt = block.timestamp;
       createdPool.poolOwner = extrinsic.signer.toString();
       createdPool.amount = extrinsic.args[1] as unknown as bigint;
