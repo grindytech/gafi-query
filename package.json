@@ -8,8 +8,8 @@
     "prepack": "rm -rf dist && npm build",
     "test": "jest",
     "codegen": "./node_modules/.bin/subql codegen",
-    "reset-docker": "rm -rf .data && docker-compose pull && docker-compose up",
-    "start:docker": "docker-compose pull && docker-compose up"
+    "reset-docker": "rm -rf .data && yarn build && docker-compose pull && docker-compose up",
+    "start:docker": "yarn build && docker-compose pull && docker-compose up"
   },
   "homepage": "https://github.com/subquery/subql-starter",
   "repository": "https://github.com/cryptoviet/gafi-query",

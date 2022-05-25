@@ -47,6 +47,7 @@ export async function handleCreateSponsoredPool(event: SubstrateEvent): Promise<
 
       createdPool.createdAt = block.timestamp;
       createdPool.poolOwner = extrinsic.signer.toString();
+      createdPool.targets = extrinsic.args[0] as unknown as string[];
       createdPool.amount = extrinsic.args[1] as unknown as bigint;
       createdPool.discount = extrinsic.args[2] as unknown as number;
       createdPool.txLimit = extrinsic.args[3] as unknown as number;
