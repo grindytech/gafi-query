@@ -21,11 +21,18 @@ type Transfer @entity {
 
 type SponsoredPool @entity {
   id: ID! #id is a required field
-  poolId: String!
   targets: [String]!
   poolOwner: String!
   amount: BigInt!
   discount: Int!
   txLimit: Int!
+  totalUsers: Int!
+  createdAt: Date
+}
+
+type UserJoinedPool @entity {
+  id: ID!
+  pool: SponsoredPool!
+  account: String!
   createdAt: Date
 }

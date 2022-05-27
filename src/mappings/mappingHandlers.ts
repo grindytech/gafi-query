@@ -1,5 +1,5 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Transfer, BlockEntity, SponsoredPool } from "../types";
+import { Transfer, BlockEntity, SponsoredPool, UserJoinedPool } from "../types";
 import { Balance } from "@polkadot/types/interfaces";
 
 export async function handleBlock(block: SubstrateBlock): Promise<void> {
@@ -31,7 +31,6 @@ export async function handleCall(extrinsic: SubstrateExtrinsic): Promise<void> {
 
 // index create sponsored pool to show list of them in dashboard. Temporary get data from args.
 export async function handleCreateSponsoredPool(event: SubstrateEvent): Promise<void> {
-  const createdPool = new SponsoredPool(`${event.block.block.header.number.toNumber()}-${event.idx}`);
   logger.info(`created pool ${event.block.hash.toString()}`);
   const {
     extrinsic: eventExtrinsic,
@@ -39,11 +38,11 @@ export async function handleCreateSponsoredPool(event: SubstrateEvent): Promise<
       data: [poolId]
     }
   } = event;
-
+  
   if (eventExtrinsic && poolId) {
     const { extrinsic, block, success } = eventExtrinsic;
     if (success) {
-      createdPool.poolId = poolId.toString();
+      const createdPool = new SponsoredPool(poolId.toString());
 
       createdPool.createdAt = block.timestamp;
       createdPool.poolOwner = extrinsic.signer.toString();
@@ -51,7 +50,36 @@ export async function handleCreateSponsoredPool(event: SubstrateEvent): Promise<
       createdPool.amount = extrinsic.args[1] as unknown as bigint;
       createdPool.discount = extrinsic.args[2] as unknown as number;
       createdPool.txLimit = extrinsic.args[3] as unknown as number;
+      createdPool.totalUsers = 0;
       await createdPool.save();
+    }
+  }
+}
+
+export async function handleUserJoinPool(event: SubstrateEvent): Promise<void> {
+  const userJoined = new UserJoinedPool(`${event.block.block.header.number.toNumber()}-${event.idx}`);
+  logger.info(`joined pool ${event.block.hash.toString()}`);
+  const {
+    extrinsic: eventExtrinsic,
+    event: {
+      data: [, poolInfo]
+    }
+  } = event;
+
+  const parsedPoolInfo = JSON.parse(poolInfo.toString())
+  
+  if (eventExtrinsic && parsedPoolInfo.sponsored) {
+    const { extrinsic, block, success } = eventExtrinsic;
+    if (success) {
+      logger.info(`parsedPoolInfo.sponsored: ${parsedPoolInfo.sponsored}`)
+      const pool = await SponsoredPool.get(parsedPoolInfo.sponsored);
+      pool.totalUsers += 1;
+      userJoined.poolId = pool.id;
+
+      userJoined.createdAt = block.timestamp;
+      userJoined.account = extrinsic.signer.toString();
+      await userJoined.save();
+      await pool.save();
     }
   }
 }
