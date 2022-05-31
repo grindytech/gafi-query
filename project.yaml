@@ -13,12 +13,12 @@ repository: 'https://github.com/cryptoviet/gafi-query'
 schema:
   file: ./schema.graphql
 network:
-  # endpoint: 'wss://ws.gafi.network'
-  # genesisHash: '0x09e7f84fb89d0525b0ec0030922a67446555769be3dfe05396644653990a5e00'
+  endpoint: 'wss://ws.gafi.network'
+  genesisHash: '0x09e7f84fb89d0525b0ec0030922a67446555769be3dfe05396644653990a5e00'
 
   # Local env
-  endpoint: 'ws://host.docker.internal:9944'
-  genesisHash: '0x75d17a42971e5e93c6ea9712f3c8e70eaebf09a2e973b8218e3c9fbd9743b936'
+  # endpoint: 'ws://host.docker.internal:9944'
+  # genesisHash: '0x75d17a42971e5e93c6ea9712f3c8e70eaebf09a2e973b8218e3c9fbd9743b936'
 dataSources:
   - kind: substrate/Runtime
     startBlock: 1
