@@ -18,7 +18,7 @@ network:
 
   # Local env
   # endpoint: 'ws://host.docker.internal:9944'
-  # genesisHash: '0x75d17a42971e5e93c6ea9712f3c8e70eaebf09a2e973b8218e3c9fbd9743b936'
+  # genesisHash: '0x6282aa214c932b064415fc7e348ecf1709806482596417fb08f8c7c518ba702f'
 dataSources:
   - kind: substrate/Runtime
     startBlock: 1
@@ -44,3 +44,8 @@ dataSources:
           filter:
             module: pool
             method: Joined
+        - handler: handleClaimContract
+          kind: substrate/EventHandler
+          filter:
+            module: gameCreator
+            method: Claimed

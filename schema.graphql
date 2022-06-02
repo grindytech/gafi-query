@@ -30,9 +30,21 @@ type SponsoredPool @entity {
   createdAt: Date
 }
 
+type User @entity {
+  id: ID! # user account address
+  createdAt: Date
+}
+
 type UserJoinedPool @entity {
   id: ID!
   pool: SponsoredPool!
-  account: String!
+  account: User!
+  createdAt: Date
+}
+
+type ClaimedContract @entity {
+  id: ID!
+  contractAddress: String!
+  account: User!
   createdAt: Date
 }

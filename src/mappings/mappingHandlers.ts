@@ -1,5 +1,5 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Transfer, BlockEntity, SponsoredPool, UserJoinedPool } from "../types";
+import { Transfer, BlockEntity, SponsoredPool, UserJoinedPool, User, ClaimedContract } from "../types";
 import { Balance } from "@polkadot/types/interfaces";
 
 export async function handleBlock(block: SubstrateBlock): Promise<void> {
@@ -73,13 +73,51 @@ export async function handleUserJoinPool(event: SubstrateEvent): Promise<void> {
     if (success) {
       logger.info(`parsedPoolInfo.sponsored: ${parsedPoolInfo.sponsored}`)
       const pool = await SponsoredPool.get(parsedPoolInfo.sponsored);
+      let user = await User.get(extrinsic.signer.toString())
+      if (!user) {
+        user = new User(extrinsic.signer.toString())
+        user.createdAt = block.timestamp; 
+      } 
       pool.totalUsers += 1;
       userJoined.poolId = pool.id;
 
       userJoined.createdAt = block.timestamp;
-      userJoined.account = extrinsic.signer.toString();
+      userJoined.accountId = user.id;
+      
+      await user.save();
       await userJoined.save();
       await pool.save();
+    }
+  }
+}
+
+export async function handleClaimContract(event: SubstrateEvent): Promise<void> {
+  logger.info(`claimed contract ${event.block.hash.toString()}`);
+
+  const {
+    extrinsic: eventExtrinsic,
+    event: {
+      data: [contractAddress, accountAddress]
+    }
+  } = event;
+
+  if (eventExtrinsic) {
+    const { extrinsic, block, success } = eventExtrinsic;
+
+    let userClaim = await User.get(accountAddress.toString());
+    if (!userClaim) {
+      userClaim = new User(accountAddress.toString())
+      userClaim.createdAt = block.timestamp; 
+    }
+    
+    if (success) {
+      const claimedContract = new ClaimedContract(`${event.block.block.header.number.toNumber()}-${event.idx}`);
+
+      claimedContract.contractAddress = contractAddress.toString();
+      claimedContract.createdAt = block.timestamp;
+      claimedContract.accountId = userClaim.id.toString();
+      await userClaim.save();
+      await claimedContract.save();
     }
   }
 }
