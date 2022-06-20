@@ -121,3 +121,22 @@ export async function handleClaimContract(event: SubstrateEvent): Promise<void> 
     }
   }
 }
+
+export async function handleSponsoredPoolNewTargets(extrinsic: SubstrateExtrinsic): Promise<void> {
+  logger.info(`Sponsored Pool new targets ${extrinsic.block.hash.toString()}`);
+
+  if (extrinsic.success) {
+    const record = await SponsoredPool.get(extrinsic.extrinsic.args[0] as unknown as string);
+    record.targets = extrinsic.extrinsic.args[1] as unknown as string[];
+
+    await record.save();
+  }
+}
+
+export async function handleSponsoredPoolWithdraw(extrinsic: SubstrateExtrinsic): Promise<void> {
+  logger.info(`Sponsored Pool withdraw ${extrinsic.block.hash.toString()}`);
+
+  if (extrinsic.success) {
+    await SponsoredPool.remove(extrinsic.extrinsic.args[0] as unknown as string);
+  }
+}

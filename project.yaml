@@ -18,7 +18,7 @@ network:
 
   # Local env
   # endpoint: 'ws://host.docker.internal:9944'
-  # genesisHash: '0x6282aa214c932b064415fc7e348ecf1709806482596417fb08f8c7c518ba702f'
+  # genesisHash: '0x51e2ffe91ee57f283040ee7ffee9085d34ec61f53844b9b951f2c02e8c89e3f4'
 dataSources:
   - kind: substrate/Runtime
     startBlock: 1
@@ -49,3 +49,13 @@ dataSources:
           filter:
             module: gameCreator
             method: Claimed
+        - handler: handleSponsoredPoolNewTargets
+          kind: substrate/CallHandler
+          filter:
+            module: sponsoredPool
+            method: newTargets
+        - handler: handleSponsoredPoolWithdraw
+          kind: substrate/CallHandler
+          filter:
+            module: sponsoredPool
+            method: withdrawPool
