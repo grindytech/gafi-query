@@ -111,7 +111,7 @@ export async function handleClaimContract(event: SubstrateEvent): Promise<void> 
     }
     
     if (success) {
-      const claimedContract = new ClaimedContract(`${event.block.block.header.number.toNumber()}-${event.idx}`);
+      const claimedContract = new ClaimedContract(contractAddress.toString());
 
       claimedContract.contractAddress = contractAddress.toString();
       claimedContract.createdAt = block.timestamp;
@@ -122,14 +122,54 @@ export async function handleClaimContract(event: SubstrateEvent): Promise<void> 
   }
 }
 
+export async function handleChangeContractOwnership(event: SubstrateEvent): Promise<void> {
+  logger.info(`change contract ownership ${event.block.hash.toString()}`);
+
+  const {
+    extrinsic: eventExtrinsic,
+    event: {
+      data: [contractAddress, newOwner]
+    }
+  } = event;
+
+  if (eventExtrinsic) {
+    const { extrinsic, block, success } = eventExtrinsic;
+
+    let newContractOwner = await User.get(newOwner.toString());
+    if (!newContractOwner) {
+      newContractOwner = new User(newOwner.toString())
+      newContractOwner.createdAt = block.timestamp; 
+    }
+    
+    if (success) {
+      const claimedContract = await ClaimedContract.get(contractAddress.toString());
+
+      if (claimedContract) {
+        claimedContract.contractAddress = contractAddress.toString();
+        claimedContract.updatedAt = block.timestamp;
+        claimedContract.accountId = newContractOwner.id.toString();
+
+        await newContractOwner.save();
+        await claimedContract.save();
+      }
+
+    }
+  }
+}
+
 export async function handleSponsoredPoolNewTargets(extrinsic: SubstrateExtrinsic): Promise<void> {
   logger.info(`Sponsored Pool new targets ${extrinsic.block.hash.toString()}`);
 
   if (extrinsic.success) {
     const record = await SponsoredPool.get(extrinsic.extrinsic.args[0] as unknown as string);
-    record.targets = extrinsic.extrinsic.args[1] as unknown as string[];
 
-    await record.save();
+    if (record) {
+      record.updatedAt = extrinsic.block.timestamp;
+      record.targets = extrinsic.extrinsic.args[1] as unknown as string[];
+      
+      await record.save();
+    }
+
   }
 }
 

@@ -49,6 +49,11 @@ dataSources:
           filter:
             module: gameCreator
             method: Claimed
+        - handler: handleChangeContractOwnership
+          kind: substrate/EventHandler
+          filter:
+            module: gameCreator
+            method: Changed
         - handler: handleSponsoredPoolNewTargets
           kind: substrate/CallHandler
           filter:
