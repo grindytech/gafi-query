@@ -1,5 +1,5 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Transfer, BlockEntity, SponsoredPool, UserJoinedPool, User, ClaimedContract } from "../types";
+import { Transfer, BlockEntity, SponsoredPool, UserJoinedPool, User, ClaimedContract, CreatedContract } from "../types";
 import { Balance } from "@polkadot/types/interfaces";
 
 export async function handleBlock(block: SubstrateBlock): Promise<void> {
@@ -179,4 +179,28 @@ export async function handleSponsoredPoolWithdraw(extrinsic: SubstrateExtrinsic)
   if (extrinsic.success) {
     await SponsoredPool.remove(extrinsic.extrinsic.args[0] as unknown as string);
   }
+}
+
+export async function handleEvmContractCreated(event: SubstrateEvent): Promise<void> {
+  logger.info(`event.event.data ${event.event.data}`)
+  const [from, to, amount, ...rest] = event.event.data;
+
+  const creator = await api.query.evm.creators(to.toString());
+  logger.info(`creator ${creator.toHuman()}`);
+  if (creator && creator.toString() === from.toString()) {
+    const createdContract = new CreatedContract(`${event.block.block.header.number.toNumber()}-${event.idx}`);
+    let newUser = await User.get(from.toString());
+      if (!newUser) {
+        newUser = new User(from.toString())
+        newUser.createdAt = event.block.timestamp; 
+      }
+  
+    createdContract.contractAddress = to.toString();
+    createdContract.accountId = newUser.id.toString();
+    createdContract.createdAt = event.block.timestamp;
+    await newUser.save();
+    await createdContract.save();
+
+  }
+
 }

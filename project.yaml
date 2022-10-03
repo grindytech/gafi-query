@@ -14,11 +14,11 @@ schema:
   file: ./schema.graphql
 network:
   endpoint: 'wss://ws.gafi.network'
-  genesisHash: '0xe77952d987927d9431ebb6b32484cb219cb9dbafe902daccc81991cd2e1f285e'
+  genesisHash: '0x68385b9a40fd0f9339687b9562de735c8e885f7d7c5437680ee00512d742b646'
 
   # Local env
   # endpoint: 'ws://host.docker.internal:9944'
-  # genesisHash: '0x51e2ffe91ee57f283040ee7ffee9085d34ec61f53844b9b951f2c02e8c89e3f4'
+  # genesisHash: '0x3e8b9c44d8e9a3f24947f70abb3eb2ececc33e4bb9ddccba6c3b27280358c5fa'
 dataSources:
   - kind: substrate/Runtime
     startBlock: 1
@@ -64,3 +64,8 @@ dataSources:
           filter:
             module: sponsoredPool
             method: withdrawPool
+        - handler: handleEvmContractCreated
+          kind: substrate/EventHandler
+          filter:
+            module: ethereum
+            method: Executed
