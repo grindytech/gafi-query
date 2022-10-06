@@ -62,17 +62,15 @@ export async function handleUserJoinPool(event: SubstrateEvent): Promise<void> {
   const {
     extrinsic: eventExtrinsic,
     event: {
-      data: [, poolInfo]
+      data: [, poolId]
     }
   } = event;
 
-  const parsedPoolInfo = JSON.parse(poolInfo.toString())
-  
-  if (eventExtrinsic && parsedPoolInfo.sponsored) {
+  if (eventExtrinsic) {
     const { extrinsic, block, success } = eventExtrinsic;
-    if (success) {
-      logger.info(`parsedPoolInfo.sponsored: ${parsedPoolInfo.sponsored}`)
-      const pool = await SponsoredPool.get(parsedPoolInfo.sponsored);
+    const pool = await SponsoredPool.get(poolId.toString());
+    if (success && pool) {
+      logger.info(`PoolId: ${poolId}`)
       let user = await User.get(extrinsic.signer.toString())
       if (!user) {
         user = new User(extrinsic.signer.toString())
