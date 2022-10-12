@@ -26,6 +26,7 @@ type SponsoredPool @entity {
   amount: BigInt!
   discount: Int!
   txLimit: Int!
+  poolName: String
   totalUsers: Int!
   createdAt: Date
   updatedAt: Date

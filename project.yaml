@@ -64,6 +64,16 @@ dataSources:
           filter:
             module: sponsoredPool
             method: withdrawPool
+        - handler: handleChangePoolName
+          kind: substrate/CallHandler
+          filter:
+            module: sponsoredPool 
+            method: setPoolName 
+        - handler: handleClearPoolName
+          kind: substrate/CallHandler
+          filter:
+            module: sponsoredPool 
+            method: clearPoolName 
         - handler: handleEvmContractCreated
           kind: substrate/EventHandler
           filter:

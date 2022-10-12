@@ -1,5 +1,5 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Transfer, BlockEntity, SponsoredPool, UserJoinedPool, User, ClaimedContract, CreatedContract } from "../types";
+import { Transfer, BlockEntity, SponsoredPool, UserJoinedPool, User } from "../types";
 import { Balance } from "@polkadot/types/interfaces";
 
 export async function handleBlock(block: SubstrateBlock): Promise<void> {
@@ -89,72 +89,6 @@ export async function handleUserJoinPool(event: SubstrateEvent): Promise<void> {
   }
 }
 
-export async function handleClaimContract(event: SubstrateEvent): Promise<void> {
-  logger.info(`claimed contract ${event.block.hash.toString()}`);
-
-  const {
-    extrinsic: eventExtrinsic,
-    event: {
-      data: [contractAddress, accountAddress]
-    }
-  } = event;
-
-  if (eventExtrinsic) {
-    const { extrinsic, block, success } = eventExtrinsic;
-
-    let userClaim = await User.get(accountAddress.toString());
-    if (!userClaim) {
-      userClaim = new User(accountAddress.toString())
-      userClaim.createdAt = block.timestamp; 
-    }
-    
-    if (success) {
-      const claimedContract = new ClaimedContract(contractAddress.toString());
-
-      claimedContract.contractAddress = contractAddress.toString();
-      claimedContract.createdAt = block.timestamp;
-      claimedContract.accountId = userClaim.id.toString();
-      await userClaim.save();
-      await claimedContract.save();
-    }
-  }
-}
-
-export async function handleChangeContractOwnership(event: SubstrateEvent): Promise<void> {
-  logger.info(`change contract ownership ${event.block.hash.toString()}`);
-
-  const {
-    extrinsic: eventExtrinsic,
-    event: {
-      data: [contractAddress, newOwner]
-    }
-  } = event;
-
-  if (eventExtrinsic) {
-    const { extrinsic, block, success } = eventExtrinsic;
-
-    let newContractOwner = await User.get(newOwner.toString());
-    if (!newContractOwner) {
-      newContractOwner = new User(newOwner.toString())
-      newContractOwner.createdAt = block.timestamp; 
-    }
-    
-    if (success) {
-      const claimedContract = await ClaimedContract.get(contractAddress.toString());
-
-      if (claimedContract) {
-        claimedContract.contractAddress = contractAddress.toString();
-        claimedContract.updatedAt = block.timestamp;
-        claimedContract.accountId = newContractOwner.id.toString();
-
-        await newContractOwner.save();
-        await claimedContract.save();
-      }
-
-    }
-  }
-}
-
 export async function handleSponsoredPoolNewTargets(extrinsic: SubstrateExtrinsic): Promise<void> {
   logger.info(`Sponsored Pool new targets ${extrinsic.block.hash.toString()}`);
 
@@ -179,26 +113,35 @@ export async function handleSponsoredPoolWithdraw(extrinsic: SubstrateExtrinsic)
   }
 }
 
-export async function handleEvmContractCreated(event: SubstrateEvent): Promise<void> {
-  logger.info(`event.event.data ${event.event.data}`)
-  const [from, to, amount, ...rest] = event.event.data;
-
-  const creator = await api.query.evm.creators(to.toString());
-  logger.info(`creator ${creator.toHuman()}`);
-  if (creator && creator.toString() === from.toString()) {
-    const createdContract = new CreatedContract(`${event.block.block.header.number.toNumber()}-${event.idx}`);
-    let newUser = await User.get(from.toString());
-      if (!newUser) {
-        newUser = new User(from.toString())
-        newUser.createdAt = event.block.timestamp; 
-      }
+export async function handleChangePoolName(extrinsic: SubstrateExtrinsic) {
+  logger.info(`Change pool name ${extrinsic.block.hash.toString()}`)
   
-    createdContract.contractAddress = to.toString();
-    createdContract.accountId = newUser.id.toString();
-    createdContract.createdAt = event.block.timestamp;
-    await newUser.save();
-    await createdContract.save();
+  if (extrinsic.success) {
+    const poolId = extrinsic.extrinsic.args[0] as unknown as string;
+    const pool = await SponsoredPool.get(poolId.toString());
+    const poolName = extrinsic.extrinsic.args[1] as unknown as string;
+  
+    logger.info(`new pool name: ${poolName}`)
+    pool.poolName = poolName.toString();
 
+    await pool.save();
   }
-
 }
+
+export async function handleClearPoolName(extrinsic: SubstrateExtrinsic) {
+  logger.info(`Clear pool name ${extrinsic.block.hash.toString()}`)
+  
+  if (extrinsic.success) {
+    const poolId = extrinsic.extrinsic.args[0] as unknown as string;
+    const pool = await SponsoredPool.get(poolId.toString());
+    
+    logger.info(`Clear pool name: ${poolId}`)
+  
+    pool.poolName = null;
+
+    await pool.save();
+  }
+}
+
+
+export * from "./contractHandlers"
