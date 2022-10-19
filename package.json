@@ -1,10 +1,11 @@
 {
   "name": "gafi-query",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Subquery project for GAFI network",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -b",
+    "subql:publish": "subql publish",
+    "build": "subql build",
     "prepack": "rm -rf dist && npm build",
     "test": "jest",
     "codegen": "./node_modules/.bin/subql codegen",
@@ -20,12 +21,12 @@
   ],
   "author": "Mike Luu",
   "license": "Apache-2.0",
-  "devDependencies": {
+  "dependencies": {
     "@polkadot/api": "^8",
-    "@subql/types": "latest",
-    "typescript": "^4.1.3",
+    "@polkadot/util": "^9.0.1",
     "@subql/cli": "latest",
-    "@polkadot/util": "^9.0.1"
+    "@subql/types": "latest",
+    "typescript": "^4.1.3"
   },
   "resolutions": {
     "ipfs-unixfs": "6.0.6"

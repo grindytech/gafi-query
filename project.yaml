@@ -3,11 +3,11 @@ name: gafi-query
 version: 1.0.0
 runner:
   node:
-    name: '@subql/node'
-    version: ^0.33.0
+    name: "@subql/node"
+    version: ">=1.0.0"
   query:
-    name: '@subql/query'
-    version: 0.24.0
+    name: "@subql/query"
+    version: "*"
 description: SubQuery project for GAFI network
 repository: 'https://github.com/cryptoviet/gafi-query'
 schema:
