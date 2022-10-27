@@ -1,6 +1,8 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
 import { Transfer, BlockEntity, SponsoredPool, UserJoinedPool, User } from "../types";
 import { Balance } from "@polkadot/types/interfaces";
+import { u8aToHex } from '@polkadot/util'
+import {decodeAddress} from '@polkadot/keyring'
 
 export async function handleBlock(block: SubstrateBlock): Promise<void> {
   let record = new BlockEntity(block.block.header.hash.toString());
@@ -9,10 +11,24 @@ export async function handleBlock(block: SubstrateBlock): Promise<void> {
   await record.save();
 }
 
+function ss58ToHex(address: string) {
+  const enAdd = u8aToHex(decodeAddress(address));
+  return enAdd;
+}
+
 export async function handleEvent(event: SubstrateEvent): Promise<void> {
   const [from, to, amount, ...rest] = event.event.data;
 
   const transfer = new Transfer(`${event.block.block.header.number.toNumber()}-${event.idx}`);
+
+  const address = ss58ToHex(to.toString());
+  const pool = await SponsoredPool.get(address);
+  
+  if (pool) {
+    const poolBalance = await api.query.system.account(to.toString());
+    pool.amount = poolBalance.data.free.toBigInt();
+    await pool.save();
+  }
 
   transfer.blockNumber = event.block.block.header.number.toBigInt();
   transfer.from = from.toString();
