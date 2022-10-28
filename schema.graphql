@@ -28,6 +28,7 @@ type SponsoredPool @entity {
   txLimit: Int!
   poolName: String
   totalUsers: Int!
+  enabledWhitelist: Boolean
   createdAt: Date
   updatedAt: Date
 }

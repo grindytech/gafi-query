@@ -159,5 +159,34 @@ export async function handleClearPoolName(extrinsic: SubstrateExtrinsic) {
   }
 }
 
+export async function  handleEnableWhitelist(extrinsic: SubstrateExtrinsic) {
+  logger.info(`Enable whitelist ${extrinsic.block.hash.toString()}`)
+  
+  if (extrinsic.success) {
+    const poolId = extrinsic.extrinsic.args[0] as unknown as string;
+    const pool = await SponsoredPool.get(poolId.toString());
+    
+    logger.info(`Enable whitelist ${poolId}`)
+  
+    pool.enabledWhitelist = true;
+
+    await pool.save();
+  } 
+}
+
+export async function handleWithdrawWhitelist(extrinsic: SubstrateExtrinsic) {
+  logger.info(`Withdraw whitelist ${extrinsic.block.hash.toString()}`)
+  
+  if (extrinsic.success) {
+    const poolId = extrinsic.extrinsic.args[0] as unknown as string;
+    const pool = await SponsoredPool.get(poolId.toString());
+    
+    logger.info(`Withdraw whitelist ${poolId}`)
+  
+    pool.enabledWhitelist = false;
+
+    await pool.save();
+  } 
+}
 
 export * from "./contractHandlers"

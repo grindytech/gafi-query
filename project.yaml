@@ -74,6 +74,16 @@ dataSources:
           filter:
             module: sponsoredPool 
             method: clearPoolName 
+        - handler: handleEnableWhitelist
+          kind: substrate/CallHandler
+          filter:
+            module: palletWhitelist 
+            method: enableWhitelist 
+        - handler: handleWithdrawWhitelist
+          kind: substrate/CallHandler
+          filter:
+            module: palletWhitelist 
+            method: withdrawWhitelist 
         - handler: handleEvmContractCreated
           kind: substrate/EventHandler
           filter:
