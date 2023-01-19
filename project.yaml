@@ -14,7 +14,7 @@ schema:
   file: ./schema.graphql
 network:
   endpoint: 'wss://ws-testnet.gafi.network'
-  genesisHash: '0x7d5f17bb816ab4d76c0c22268fa59bb4f56cfaec4d567bd21e21acfdd4982ae2'
+  genesisHash: '0xe894fc2ecb5eb95f6f78e73961486a8ef0992cbd13b071782875478ea7da0e61'
 
   # Local env
   # endpoint: 'ws://host.docker.internal:9944'
